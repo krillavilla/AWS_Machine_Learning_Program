@@ -1,3 +1,6 @@
 [submodule "nd189-1-Introduction-to-Machine-Learning"]
 	path = nd189-1-Introduction-to-Machine-Learning
 	url = https://github.com/krillavilla/nd189-1-Introduction-to-Machine-Learning.git
+[submodule "Developing-ML-Workflow"]
+	path = Developing-ML-Workflow
+	url = https://github.com/krillavilla/Developing-ML-Workflow.git
