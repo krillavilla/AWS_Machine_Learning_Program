@@ -1,0 +1,281 @@
+<html>
+<head>
+<title>project-template.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #637777; font-style: italic;}
+.s1 { color: #d6deeb;}
+.s2 { color: #c792ea; font-style: italic;}
+.s3 { color: #d6deeb;}
+.s4 { color: #c792ea;}
+.s5 { color: #ecc48d;}
+.s6 { color: #f78c6c;}
+.s7 { color: #d6deeb;}
+.s8 { color: #5f7e97;}
+</style>
+</head>
+<body bgcolor="#011627">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+project-template.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% md 
+</span><span class="s1"># Predict Bike Sharing Demand with AutoGluon Template 
+</span><span class="s0">#%% md 
+</span><span class="s1">## Project: Predict Bike Sharing Demand with AutoGluon 
+This notebook is a template with each step that you need to complete for the project. 
+ 
+Please fill in your code where there are explicit `?` markers in the notebook. You are welcome to add more cells and code as you see fit. 
+ 
+Once you have completed all the code implementations, please export your notebook as a HTML file so the reviews can view your code. Make sure you have all outputs correctly outputted. 
+ 
+`File-&gt; Export Notebook As... -&gt; Export Notebook as HTML` 
+ 
+There is a writeup to complete as well after all code implememtation is done. Please answer all questions and attach the necessary tables and charts. You can complete the writeup in either markdown or PDF. 
+ 
+Completing the code template and writeup template will cover all of the rubric points for this project. 
+ 
+The rubric contains &quot;Stand Out Suggestions&quot; for enhancing the project beyond the minimum requirements. The stand out suggestions are optional. If you decide to pursue the &quot;stand out suggestions&quot;, you can include the code in this notebook and also discuss the results in the writeup file. 
+</span><span class="s0">#%% md 
+</span><span class="s1">## Step 1: Create an account with Kaggle 
+</span><span class="s0">#%% md 
+</span><span class="s1">### Create Kaggle Account and download API key 
+Below is example of steps to get the API username and key. Each student will have their own username and key. 
+</span><span class="s0">#%% md 
+</span><span class="s1">1. Open account settings. 
+![kaggle1.png](attachment:kaggle1.png) 
+![kaggle2.png](attachment:kaggle2.png) 
+2. Scroll down to API and click Create New API Token. 
+![kaggle3.png](attachment:kaggle3.png) 
+![kaggle4.png](attachment:kaggle4.png) 
+3. Open up `kaggle.json` and use the username and key. 
+![kaggle5.png](attachment:kaggle5.png) 
+</span><span class="s0">#%% md 
+</span><span class="s1">## Step 2: Download the Kaggle dataset using the kaggle python library 
+</span><span class="s0">#%% md 
+</span><span class="s1">### Open up Sagemaker Studio and use starter template 
+</span><span class="s0">#%% md 
+</span><span class="s1">1. Notebook should be using a `ml.t3.medium` instance (2 vCPU + 4 GiB) 
+2. Notebook should be using kernal: `Python 3 (MXNet 1.8 Python 3.7 CPU Optimized)` 
+</span><span class="s0">#%% md 
+</span><span class="s1">### Install packages 
+</span><span class="s0">#%% 
+</span><span class="s2">from </span><span class="s1">cProfile </span><span class="s2">import </span><span class="s1">label</span>
+<span class="s3">!</span><span class="s1">pip install </span><span class="s4">-</span><span class="s1">U pip</span>
+<span class="s3">!</span><span class="s1">pip install </span><span class="s4">-</span><span class="s1">U setuptools wheel</span>
+<span class="s3">!</span><span class="s1">pip install </span><span class="s4">-</span><span class="s1">U </span><span class="s5">&quot;mxnet&lt;2.0.0&quot; </span><span class="s1">bokeh</span><span class="s4">==</span><span class="s6">2.0.1</span>
+<span class="s3">!</span><span class="s1">pip install autogluon </span><span class="s4">--</span><span class="s1">no</span><span class="s4">-</span><span class="s1">cache</span><span class="s4">-</span><span class="s1">dir</span>
+<span class="s0"># Without --no-cache-dir, smaller aws instances may have trouble installing</span>
+<span class="s0">#%% md 
+</span><span class="s1">### Setup Kaggle API Key 
+</span><span class="s0">#%% 
+# create the .kaggle directory and an empty kaggle.json file</span>
+<span class="s3">!</span><span class="s1">mkdir </span><span class="s4">-</span><span class="s1">p </span><span class="s4">/</span><span class="s1">root</span><span class="s4">/.</span><span class="s1">kaggle</span>
+<span class="s3">!</span><span class="s1">touch </span><span class="s4">/</span><span class="s1">root</span><span class="s4">/.</span><span class="s1">kaggle</span><span class="s4">/</span><span class="s1">kaggle</span><span class="s4">.</span><span class="s1">json</span>
+<span class="s3">!</span><span class="s1">chmod </span><span class="s6">600 </span><span class="s4">/</span><span class="s1">root</span><span class="s4">/.</span><span class="s1">kaggle</span><span class="s4">/</span><span class="s1">kaggle</span><span class="s4">.</span><span class="s1">json</span>
+<span class="s0">#%% 
+# Fill in your user name and key from creating the kaggle account and API token file</span>
+<span class="s2">import </span><span class="s1">json</span>
+<span class="s1">kaggle_username </span><span class="s4">= </span><span class="s5">&quot;kashadturnerwarren&quot;</span>
+<span class="s1">kaggle_key </span><span class="s4">= </span><span class="s5">&quot;a89abf88d28c33ccb437f05ee6c050aa&quot;</span>
+
+<span class="s0"># Save API token the kaggle.json file</span>
+<span class="s2">with </span><span class="s1">open</span><span class="s7">(</span><span class="s5">&quot;/home/krillavilla/Documents/AWS_Machine_Learning_Program/.kaggle/kaggle.json&quot;</span><span class="s8">, </span><span class="s5">&quot;w&quot;</span><span class="s7">) </span><span class="s2">as </span><span class="s1">f</span><span class="s4">:</span>
+    <span class="s1">f</span><span class="s4">.</span><span class="s1">write</span><span class="s7">(</span><span class="s1">json</span><span class="s4">.</span><span class="s1">dumps</span><span class="s7">({</span><span class="s5">&quot;username&quot;</span><span class="s4">: </span><span class="s1">kaggle_username</span><span class="s8">, </span><span class="s5">&quot;key&quot;</span><span class="s4">: </span><span class="s1">kaggle_key</span><span class="s7">}))</span>
+<span class="s0">#%% md 
+</span><span class="s1">### Download and explore dataset 
+</span><span class="s0">#%% md 
+</span><span class="s1">### Go to the bike sharing demand competition and agree to the terms 
+![kaggle6.png](attachment:kaggle6.png) 
+</span><span class="s0">#%% 
+# Download the dataset, it will be in a .zip file so you'll need to unzip it as well.</span>
+<span class="s3">!</span><span class="s1">kaggle competitions download </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand</span>
+<span class="s0"># If you already downloaded it you can use the -o command to overwrite the file</span>
+<span class="s3">!</span><span class="s1">unzip </span><span class="s4">-</span><span class="s1">o bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand</span><span class="s4">.</span><span class="s1">zip</span>
+<span class="s0">#%% 
+</span><span class="s2">import </span><span class="s1">pandas </span><span class="s2">as </span><span class="s1">pd</span>
+<span class="s2">from </span><span class="s1">autogluon</span><span class="s4">.</span><span class="s1">tabular </span><span class="s2">import </span><span class="s1">TabularPredictor</span>
+<span class="s0">#%% 
+# Create the train dataset in pandas by reading the csv</span>
+<span class="s0"># Set the parsing of the datetime column so you can use some of the `dt` features in pandas later</span>
+<span class="s1">train </span><span class="s4">= </span><span class="s1">pd</span><span class="s4">.</span><span class="s1">read_csv</span><span class="s7">(</span><span class="s5">&quot;train.csv&quot;</span><span class="s8">, </span><span class="s1">parse_dates</span><span class="s4">=</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">])</span>
+<span class="s1">test </span><span class="s4">= </span><span class="s1">pd</span><span class="s4">.</span><span class="s1">read_csv</span><span class="s7">(</span><span class="s5">&quot;test.csv&quot;</span><span class="s8">, </span><span class="s1">parse_dates</span><span class="s4">=</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">])</span>
+
+<span class="s0"># Drop the casual and registered columns as they are not present in the test dataset</span>
+<span class="s2">if </span><span class="s5">'casual' </span><span class="s2">in </span><span class="s1">train</span><span class="s4">.</span><span class="s1">columns</span><span class="s4">:</span>
+    <span class="s1">train </span><span class="s4">= </span><span class="s1">train</span><span class="s4">.</span><span class="s1">drop</span><span class="s7">(</span><span class="s1">columns</span><span class="s4">=</span><span class="s7">[</span><span class="s5">'casual'</span><span class="s7">])</span>
+<span class="s2">if </span><span class="s5">'registered' </span><span class="s2">in </span><span class="s1">train</span><span class="s4">.</span><span class="s1">columns</span><span class="s4">:</span>
+    <span class="s1">train </span><span class="s4">= </span><span class="s1">train</span><span class="s4">.</span><span class="s1">drop</span><span class="s7">(</span><span class="s1">columns</span><span class="s4">=</span><span class="s7">[</span><span class="s5">'registered'</span><span class="s7">])</span>
+    
+<span class="s1">train</span><span class="s4">.</span><span class="s1">head</span><span class="s7">()</span>
+<span class="s0">#%% 
+# Simple output of the train dataset to view some of the min/max/varition of the dataset features.</span>
+<span class="s0">#%% 
+# Create the test pandas dataframe in pandas by reading the csv, remember to parse the datetime!</span>
+<span class="s1">test </span><span class="s4">= </span><span class="s1">pd</span><span class="s4">.</span><span class="s1">read_csv</span><span class="s7">(</span><span class="s5">&quot;test.csv&quot;</span><span class="s8">, </span><span class="s1">parse_dates</span><span class="s4">=</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">])</span>
+<span class="s1">test</span><span class="s4">.</span><span class="s1">head</span><span class="s7">()</span>
+<span class="s0">#%% 
+# Same thing as train and test dataset</span>
+<span class="s1">submission </span><span class="s4">= </span><span class="s1">pd</span><span class="s4">.</span><span class="s1">read_csv</span><span class="s7">(</span><span class="s5">&quot;sampleSubmission.csv&quot;</span><span class="s7">)</span>
+<span class="s1">submission</span><span class="s4">.</span><span class="s1">head</span><span class="s7">()</span>
+<span class="s0">#%% md 
+</span><span class="s1">## Step 3: Train a model using AutoGluon’s Tabular Prediction 
+</span><span class="s0">#%% md 
+</span><span class="s1">Requirements: 
+* We are prediting `count`, so it is the label we are setting. 
+* Ignore `casual` and `registered` columns as they are also not present in the test dataset.  
+* Use the `root_mean_squared_error` as the metric to use for evaluation. 
+* Set a time limit of 10 minutes (600 seconds). 
+* Use the preset `best_quality` to focus on creating the best model. 
+</span><span class="s0">#%% 
+</span><span class="s1">predictor </span><span class="s4">= </span><span class="s1">TabularPredictor</span><span class="s7">(</span><span class="s1">label</span><span class="s4">=</span><span class="s5">'count'</span><span class="s8">, </span><span class="s1">eval_metric</span><span class="s4">=</span><span class="s5">'root_mean_squared_error'</span><span class="s7">)</span><span class="s4">.</span><span class="s1">fit</span><span class="s7">(</span><span class="s1">train</span><span class="s8">, </span><span class="s1">time_limit</span><span class="s4">=</span><span class="s6">600</span><span class="s8">, </span><span class="s1">presets</span><span class="s4">=</span><span class="s5">'best_quality'</span><span class="s7">)</span>
+<span class="s0">#%% md 
+</span><span class="s1">### Review AutoGluon's training run with ranking of models that did the best. 
+</span><span class="s0">#%% 
+</span><span class="s1">predictor</span><span class="s4">.</span><span class="s1">fit_summary</span><span class="s7">()</span>
+<span class="s0">#%% md 
+</span><span class="s1">### Create predictions from test dataset 
+</span><span class="s0">#%% 
+</span><span class="s1">predictions </span><span class="s4">= </span><span class="s1">predictor</span><span class="s4">.</span><span class="s1">predict</span><span class="s7">(</span><span class="s1">test</span><span class="s7">)</span>
+<span class="s1">predictions</span><span class="s4">.</span><span class="s1">head</span><span class="s7">()</span>
+<span class="s0">#%% md 
+</span><span class="s1">#### NOTE: Kaggle will reject the submission if we don't set everything to be &gt; 0. 
+</span><span class="s0">#%% 
+# Describe the `predictions` series to see if there are any negative values</span>
+<span class="s1">predictions</span><span class="s4">.</span><span class="s1">describe</span><span class="s7">()</span>
+<span class="s0">#%% 
+# How many negative values do we have?</span>
+<span class="s7">(</span><span class="s1">predictions </span><span class="s4">&lt; </span><span class="s6">0</span><span class="s7">)</span><span class="s4">.</span><span class="s1">sum</span><span class="s7">()</span>
+<span class="s0">#%% 
+# Set them to zero</span>
+<span class="s1">predictions </span><span class="s4">= </span><span class="s1">predictions</span><span class="s4">.</span><span class="s1">clip</span><span class="s7">(</span><span class="s1">lower</span><span class="s4">=</span><span class="s6">0</span><span class="s7">)</span>
+<span class="s0">#%% md 
+</span><span class="s1">### Set predictions to submission dataframe, save, and submit 
+</span><span class="s0">#%% 
+</span><span class="s1">submission</span><span class="s7">[</span><span class="s5">&quot;count&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">predictions</span>
+<span class="s1">submission</span><span class="s4">.</span><span class="s1">to_csv</span><span class="s7">(</span><span class="s5">&quot;submission.csv&quot;</span><span class="s8">, </span><span class="s1">index</span><span class="s4">=</span><span class="s2">False</span><span class="s7">)</span>
+<span class="s0">#%% 
+</span><span class="s3">!</span><span class="s1">kaggle competitions submit </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand </span><span class="s4">-</span><span class="s1">f submission</span><span class="s4">.</span><span class="s1">csv </span><span class="s4">-</span><span class="s1">m </span><span class="s5">&quot;first raw submission&quot;</span>
+<span class="s0">#%% md 
+</span><span class="s1">#### View submission via the command line or in the web browser under the competition's page - `My Submissions` 
+</span><span class="s0">#%% 
+</span><span class="s3">!</span><span class="s1">kaggle competitions submissions </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand </span><span class="s4">| </span><span class="s1">tail </span><span class="s4">-</span><span class="s1">n </span><span class="s4">+</span><span class="s6">1 </span><span class="s4">| </span><span class="s1">head </span><span class="s4">-</span><span class="s1">n </span><span class="s6">6</span>
+<span class="s0">#%% md 
+</span><span class="s1">#### Initial score of `?` 
+</span><span class="s0">#%% md 
+</span><span class="s1">## Step 4: Exploratory Data Analysis and Creating an additional feature 
+* Any additional feature will do, but a great suggestion would be to separate out the datetime into hour, day, or month parts. 
+</span><span class="s0">#%% 
+# Create a histogram of all features to show the distribution of each one relative to the data. This is part of the exploritory data analysis</span>
+<span class="s1">train</span><span class="s4">.</span><span class="s1">hist</span><span class="s7">(</span><span class="s1">figsize</span><span class="s4">=</span><span class="s7">(</span><span class="s6">10</span><span class="s8">, </span><span class="s6">10</span><span class="s7">))</span>
+<span class="s0">#%% 
+# create a new feature</span>
+<span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;hour&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">hour</span>
+<span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;hour&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">hour</span>
+
+<span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;day&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">day</span>
+<span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;day&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">day</span>
+
+<span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;month&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">month</span>
+<span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;month&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">month</span>
+
+<span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;year&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">year</span>
+<span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;year&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;datetime&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">dt</span><span class="s4">.</span><span class="s1">year</span>
+<span class="s0">#%% md 
+</span><span class="s1">## Make category types for these so models know they are not just numbers 
+* AutoGluon originally sees these as ints, but in reality they are int representations of a category. 
+* Setting the dtype to category will classify these as categories in AutoGluon. 
+</span><span class="s0">#%% 
+</span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;season&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;season&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">astype</span><span class="s7">(</span><span class="s5">&quot;category&quot;</span><span class="s7">)</span>
+<span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;weather&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">train</span><span class="s7">[</span><span class="s5">&quot;weather&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">astype</span><span class="s7">(</span><span class="s5">&quot;category&quot;</span><span class="s7">)</span>
+<span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;season&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;season&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">astype</span><span class="s7">(</span><span class="s5">&quot;category&quot;</span><span class="s7">)</span>
+<span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;weather&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">test</span><span class="s7">[</span><span class="s5">&quot;weather&quot;</span><span class="s7">]</span><span class="s4">.</span><span class="s1">astype</span><span class="s7">(</span><span class="s5">&quot;category&quot;</span><span class="s7">)</span>
+<span class="s0">#%% 
+# View are new feature</span>
+<span class="s1">train</span><span class="s4">.</span><span class="s1">head</span><span class="s7">()</span>
+<span class="s0">#%% 
+# View histogram of all features again now with the hour feature</span>
+<span class="s1">train</span><span class="s4">.</span><span class="s1">hist</span><span class="s7">(</span><span class="s1">figsize</span><span class="s4">=</span><span class="s7">(</span><span class="s6">10</span><span class="s8">, </span><span class="s6">10</span><span class="s7">))</span>
+<span class="s0">#%% md 
+</span><span class="s1">## Step 5: Rerun the model with the same settings as before, just with more features 
+</span><span class="s0">#%% 
+</span><span class="s1">predictor_new_features </span><span class="s4">= </span><span class="s1">TabularPredictor</span><span class="s7">(</span><span class="s1">label</span><span class="s4">=</span><span class="s5">'count'</span><span class="s8">, </span><span class="s1">eval_metric</span><span class="s4">=</span><span class="s5">'root_mean_squared_error'</span><span class="s7">)</span><span class="s4">.</span><span class="s1">fit</span><span class="s7">(</span><span class="s1">train</span><span class="s8">, </span><span class="s1">time_limit</span><span class="s4">=</span><span class="s6">600</span><span class="s8">, </span><span class="s1">presets</span><span class="s4">=</span><span class="s5">'best_quality'</span><span class="s7">)</span>
+<span class="s0">#%% 
+</span><span class="s1">predictor_new_features</span><span class="s4">.</span><span class="s1">fit_summary</span><span class="s7">()</span>
+<span class="s0">#%% 
+# Remember to set all negative values to zero</span>
+<span class="s1">predictions_new_features </span><span class="s4">= </span><span class="s1">predictor_new_features</span><span class="s4">.</span><span class="s1">predict</span><span class="s7">(</span><span class="s1">test</span><span class="s7">)</span>
+<span class="s1">predictions_new_features </span><span class="s4">= </span><span class="s1">predictions_new_features</span><span class="s4">.</span><span class="s1">clip</span><span class="s7">(</span><span class="s1">lower</span><span class="s4">=</span><span class="s6">0</span><span class="s7">)</span>
+
+<span class="s0">#%% 
+# Same submitting predictions</span>
+<span class="s1">submission_new_features </span><span class="s4">= </span><span class="s1">submission</span><span class="s4">.</span><span class="s1">copy</span><span class="s7">()</span>
+<span class="s1">submission_new_features</span><span class="s7">[</span><span class="s5">&quot;count&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">predictions_new_features</span>
+<span class="s1">submission_new_features</span><span class="s4">.</span><span class="s1">to_csv</span><span class="s7">(</span><span class="s5">&quot;submission_new_features.csv&quot;</span><span class="s8">, </span><span class="s1">index</span><span class="s4">=</span><span class="s2">False</span><span class="s7">)</span>
+<span class="s0">#%% 
+</span><span class="s3">!</span><span class="s1">kaggle competitions submit </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand </span><span class="s4">-</span><span class="s1">f submission_new_features</span><span class="s4">.</span><span class="s1">csv </span><span class="s4">-</span><span class="s1">m </span><span class="s5">&quot;new features&quot;</span>
+<span class="s0">#%% 
+</span><span class="s3">!</span><span class="s1">kaggle competitions submissions </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand </span><span class="s4">| </span><span class="s1">tail </span><span class="s4">-</span><span class="s1">n </span><span class="s4">+</span><span class="s6">1 </span><span class="s4">| </span><span class="s1">head </span><span class="s4">-</span><span class="s1">n </span><span class="s6">6</span>
+<span class="s0">#%% md 
+</span><span class="s1">#### New Score of `?` 
+</span><span class="s0">#%% md 
+</span><span class="s1">## Step 6: Hyper parameter optimization 
+* There are many options for hyper parameter optimization. 
+* Options are to change the AutoGluon higher level parameters or the individual model hyperparameters. 
+* The hyperparameters of the models themselves that are in AutoGluon. Those need the `hyperparameter` and `hyperparameter_tune_kwargs` arguments. 
+</span><span class="s0">#%% 
+</span><span class="s1">predictor_new_hpo </span><span class="s4">= </span><span class="s1">TabularPredictor</span><span class="s7">(</span><span class="s1">label</span><span class="s4">=</span><span class="s5">'count'</span><span class="s8">, </span><span class="s1">eval_metric</span><span class="s4">=</span><span class="s5">'root_mean_squared_error'</span><span class="s7">)</span><span class="s4">.</span><span class="s1">fit</span><span class="s7">(</span><span class="s1">train</span><span class="s8">, </span><span class="s1">time_limit</span><span class="s4">=</span><span class="s6">600</span><span class="s8">, </span><span class="s1">presets</span><span class="s4">=</span><span class="s5">'best_quality'</span><span class="s8">, </span><span class="s1">hyperparameters</span><span class="s4">=</span><span class="s7">{</span><span class="s5">'GBM'</span><span class="s4">: </span><span class="s7">{}})</span>
+<span class="s0">#%% 
+</span><span class="s1">predictor_new_hpo</span><span class="s4">.</span><span class="s1">fit_summary</span><span class="s7">()</span>
+<span class="s0">#%% 
+# Remember to set all negative values to zero</span>
+<span class="s1">predictions_new_hpo </span><span class="s4">= </span><span class="s1">predictor_new_hpo</span><span class="s4">.</span><span class="s1">predict</span><span class="s7">(</span><span class="s1">test</span><span class="s7">)</span>
+<span class="s1">predictions_new_hpo </span><span class="s4">= </span><span class="s1">predictions_new_hpo</span><span class="s4">.</span><span class="s1">clip</span><span class="s7">(</span><span class="s1">lower</span><span class="s4">=</span><span class="s6">0</span><span class="s7">)</span>
+<span class="s0">#%% 
+# Same submitting predictions</span>
+<span class="s1">submission_new_hpo </span><span class="s4">= </span><span class="s1">submission</span><span class="s4">.</span><span class="s1">copy</span><span class="s7">()</span>
+<span class="s1">submission_new_hpo</span><span class="s7">[</span><span class="s5">&quot;count&quot;</span><span class="s7">] </span><span class="s4">= </span><span class="s1">predictions_new_hpo</span>
+<span class="s1">submission_new_hpo</span><span class="s4">.</span><span class="s1">to_csv</span><span class="s7">(</span><span class="s5">&quot;submission_new_hpo.csv&quot;</span><span class="s8">, </span><span class="s1">index</span><span class="s4">=</span><span class="s2">False</span><span class="s7">)</span>
+<span class="s0">#%% 
+</span><span class="s3">!</span><span class="s1">kaggle competitions submit </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand </span><span class="s4">-</span><span class="s1">f submission_new_hpo</span><span class="s4">.</span><span class="s1">csv </span><span class="s4">-</span><span class="s1">m </span><span class="s5">&quot;new features with hyperparameters&quot;</span>
+<span class="s0">#%% 
+</span><span class="s3">!</span><span class="s1">kaggle competitions submissions </span><span class="s4">-</span><span class="s1">c bike</span><span class="s4">-</span><span class="s1">sharing</span><span class="s4">-</span><span class="s1">demand </span><span class="s4">| </span><span class="s1">tail </span><span class="s4">-</span><span class="s1">n </span><span class="s4">+</span><span class="s6">1 </span><span class="s4">| </span><span class="s1">head </span><span class="s4">-</span><span class="s1">n </span><span class="s6">6</span>
+<span class="s0">#%% md 
+</span><span class="s1">#### New Score of `?` 
+</span><span class="s0">#%% md 
+</span><span class="s1">## Step 7: Write a Report 
+### Refer to the markdown file for the full report 
+### Creating plots and table for report 
+</span><span class="s0">#%% 
+# Taking the top model score from each training run and creating a line plot to show improvement</span>
+<span class="s0"># You can create these in the notebook and save them to PNG or use some other tool (e.g. google sheets, excel)</span>
+<span class="s1">fig </span><span class="s4">= </span><span class="s1">pd</span><span class="s4">.</span><span class="s1">DataFrame</span><span class="s7">(</span>
+    <span class="s7">{</span>
+        <span class="s5">&quot;model&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s5">&quot;initial&quot;</span><span class="s8">, </span><span class="s5">&quot;add_features&quot;</span><span class="s8">, </span><span class="s5">&quot;hpo&quot;</span><span class="s7">]</span><span class="s8">,</span>
+        <span class="s5">&quot;score&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s6">0.123</span><span class="s8">, </span><span class="s6">0.456</span><span class="s8">, </span><span class="s6">0.789</span><span class="s7">]</span>
+    <span class="s7">}</span>
+<span class="s7">)</span><span class="s4">.</span><span class="s1">plot</span><span class="s7">(</span><span class="s1">x</span><span class="s4">=</span><span class="s5">&quot;model&quot;</span><span class="s8">, </span><span class="s1">y</span><span class="s4">=</span><span class="s5">&quot;score&quot;</span><span class="s8">, </span><span class="s1">figsize</span><span class="s4">=</span><span class="s7">(</span><span class="s6">8</span><span class="s8">, </span><span class="s6">6</span><span class="s7">))</span><span class="s4">.</span><span class="s1">get_figure</span><span class="s7">()</span>
+<span class="s1">fig</span><span class="s4">.</span><span class="s1">savefig</span><span class="s7">(</span><span class="s5">'model_train_score.png'</span><span class="s7">)</span>
+<span class="s0">#%% 
+# Take the 3 kaggle scores and creating a line plot to show improvement</span>
+<span class="s1">fig </span><span class="s4">= </span><span class="s1">pd</span><span class="s4">.</span><span class="s1">DataFrame</span><span class="s7">(</span>
+    <span class="s7">{</span>
+        <span class="s5">&quot;test_eval&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s5">&quot;initial&quot;</span><span class="s8">, </span><span class="s5">&quot;add_features&quot;</span><span class="s8">, </span><span class="s5">&quot;hpo&quot;</span><span class="s7">]</span><span class="s8">,</span>
+        <span class="s5">&quot;score&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s6">0.123</span><span class="s8">, </span><span class="s6">0.456</span><span class="s8">, </span><span class="s6">0.789</span><span class="s7">]</span>
+    <span class="s7">}</span>
+<span class="s7">)</span><span class="s4">.</span><span class="s1">plot</span><span class="s7">(</span><span class="s1">x</span><span class="s4">=</span><span class="s5">&quot;test_eval&quot;</span><span class="s8">, </span><span class="s1">y</span><span class="s4">=</span><span class="s5">&quot;score&quot;</span><span class="s8">, </span><span class="s1">figsize</span><span class="s4">=</span><span class="s7">(</span><span class="s6">8</span><span class="s8">, </span><span class="s6">6</span><span class="s7">))</span><span class="s4">.</span><span class="s1">get_figure</span><span class="s7">()</span>
+<span class="s1">fig</span><span class="s4">.</span><span class="s1">savefig</span><span class="s7">(</span><span class="s5">'model_test_score.png'</span><span class="s7">)</span>
+<span class="s0">#%% md 
+</span><span class="s1">### Hyperparameter table 
+</span><span class="s0">#%% 
+# The 3 hyperparameters we tuned with the kaggle score as the result</span>
+<span class="s1">pd</span><span class="s4">.</span><span class="s1">DataFrame</span><span class="s7">({</span>
+    <span class="s5">&quot;model&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s5">&quot;initial&quot;</span><span class="s8">, </span><span class="s5">&quot;add_features&quot;</span><span class="s8">, </span><span class="s5">&quot;hpo&quot;</span><span class="s7">]</span><span class="s8">,</span>
+    <span class="s5">&quot;hpo1&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s6">0.1</span><span class="s8">, </span><span class="s6">0.2</span><span class="s8">, </span><span class="s6">0.3</span><span class="s7">]</span><span class="s8">,</span>
+    <span class="s5">&quot;hpo2&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s6">0.4</span><span class="s8">, </span><span class="s6">0.5</span><span class="s8">, </span><span class="s6">0.6</span><span class="s7">]</span><span class="s8">,</span>
+    <span class="s5">&quot;hpo3&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s6">0.7</span><span class="s8">, </span><span class="s6">0.8</span><span class="s8">, </span><span class="s6">0.9</span><span class="s7">]</span><span class="s8">,</span>
+    <span class="s5">&quot;score&quot;</span><span class="s4">: </span><span class="s7">[</span><span class="s6">0.123</span><span class="s8">, </span><span class="s6">0.456</span><span class="s8">, </span><span class="s6">0.789</span><span class="s7">]</span>
+<span class="s7">})</span></pre>
+</body>
+</html>
